@@ -14,13 +14,13 @@ Additional information about the plugin can be found here: https://wiki.jenkins-
 
 ###Generating a Login Token
 To generate an AppScan Source login token, execute the AppScan Source CLI, then log in with the following parameters:
-`AppScan Enterprise Server URL, AppScan Source username, AppScan Source password -persist [-acceptssl]`
+`AppScan Enterprise Server Hostname, AppScan Source username, AppScan Source password -persist [-acceptssl]`
 
 ex. 
 
 `AppScanSrcCli.exe` 
 
-`login http://localhost:9443/asc myHostname\administrator appScanSourcePassword! -persist -acceptssl`
+`login localhost myHostname\administrator appScanSourcePassword! -persist -acceptssl`
 
 This will generate a file named ouncecli.token in the .ounce folder within home directory of the user who executes the command.
 
