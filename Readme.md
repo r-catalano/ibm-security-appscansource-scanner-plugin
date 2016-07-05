@@ -16,9 +16,13 @@ Additional information about the plugin can be found here: https://wiki.jenkins-
 To generate an AppScan Source login token, execute the AppScan Source CLI, then log in with the following parameters:
 `AppScan Enterprise Server URL, AppScan Source username, AppScan Source password -persist [-acceptssl]`
 
-ex. `AppScanSrcCli.exe login http://localhost:9443/asc myHostname\administrator appScanSourcePassword! -persist -acceptssl`
+ex. 
 
-This will generate a file named ouncecli.token in the home directory of the user who executes the command.
+`AppScanSrcCli.exe` 
+
+`login http://localhost:9443/asc myHostname\administrator appScanSourcePassword! -persist -acceptssl`
+
+This will generate a file named ouncecli.token in the .ounce folder within home directory of the user who executes the command.
 
 For additional information, please see IBM's documentation:
 http://www-01.ibm.com/support/knowledgecenter/SSS9LM_9.0.1/com.ibm.rational.appscansrc.utilities.doc/topics/command_line_interface_commands_login.html
