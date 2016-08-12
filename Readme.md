@@ -71,3 +71,14 @@ This version of the plugin was tested with Jenkins 1.651.1 and IBM Security AppS
 
 ##Roadmap
 The next step in the roadmap is to support automated publishing of scan results to AppScan Enterprise.
+
+## Release Notes
+v1.0.0: 
+* Initial release
+
+v1.0.3: 
+* Fixed bugs to add better support for a multi-Jenkins node environment
+
+v1.0.5: 
+* Added custom scan configuration options, 
+* Added some help text for input fields
