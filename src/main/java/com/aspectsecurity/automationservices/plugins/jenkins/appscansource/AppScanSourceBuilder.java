@@ -38,12 +38,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class AppScanSourceBuilder extends Builder implements SimpleBuildStep {
 
     private final boolean disableScan;
     private final boolean acceptSSL;
-    private final String scanWorkspace;
+    private final String customScanWorkspace;
+    private String scanWorkspace;
     private final String applicationFile;
     private String installation;
     Jenkins j = Jenkins.getInstance();
@@ -53,13 +56,18 @@ public class AppScanSourceBuilder extends Builder implements SimpleBuildStep {
 
     // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
     @DataBoundConstructor
-    public AppScanSourceBuilder(String installation, boolean disableScan, String scanWorkspace, String applicationFile, boolean acceptSSL) {
+    public AppScanSourceBuilder(String installation, boolean disableScan, String applicationFile, boolean acceptSSL, String customScanWorkspace) {
     	this.disableScan=disableScan;
-        this.scanWorkspace=scanWorkspace;
         this.applicationFile=applicationFile;
         this.installation=installation;
         this.acceptSSL=acceptSSL;
-      
+        
+        
+        if (customScanWorkspace == null){
+        	customScanWorkspace = "";
+        }
+        
+        this.customScanWorkspace=customScanWorkspace.trim();
     }
 
     /**
@@ -69,6 +77,10 @@ public class AppScanSourceBuilder extends Builder implements SimpleBuildStep {
         return disableScan;
     }
 
+    public String getCustomScanWorkspace(){
+    	return customScanWorkspace;
+    }
+    
     public boolean getAcceptSSL() {
         return acceptSSL;
     }
@@ -103,8 +115,22 @@ public class AppScanSourceBuilder extends Builder implements SimpleBuildStep {
             throws InterruptedException, IOException {
 
     	logger = listener.getLogger();
-    	
+    			
     	if(!this.disableScan){
+    		
+        	String jenkinsJobsDir = envVars.get("JENKINS_HOME") + "\\jobs";
+        	String defaultScanWorkspace = jenkinsJobsDir + "\\" + envVars.get("JOB_NAME") + "\\builds\\" + envVars.get("BUILD_NUMBER");
+        	
+			//If no scan workspace was set, we use the default, which is the Jenkins build directory
+			if (!this.customScanWorkspace.equals("")){
+					this.scanWorkspace = customScanWorkspace;
+			} else {
+				this.scanWorkspace = defaultScanWorkspace;
+			}
+			
+			//Check that we can access the scan workspace	
+			boolean scanWorkspaceOk = checkScanWorkspace(this.scanWorkspace);
+			
     		//Check that the application file exists and has the expected extension
     		boolean applicationFileOk = false;
 			if(!checkApplicationFileName(this.applicationFile)){
@@ -116,43 +142,25 @@ public class AppScanSourceBuilder extends Builder implements SimpleBuildStep {
 					applicationFileOk = true;
 				}
 			}
-			//Check that we can access the scan workspace
-			boolean scanWorkspaceOk = checkScanWorkspace(this.scanWorkspace);
 			
 			//Only run the scan if the workspace and application file are ok
 			if(applicationFileOk && scanWorkspaceOk){
 				logger.println("Scanning " + applicationFile + " with AppScan Source");
-				
-				//String exe = AppScanSourceInstallation.getExecutable(installation, AppScanSourceCommand.AppScanSourceCLI, node, listener, envVars);
+				logger.println("Using Scan Workspace: " + scanWorkspace);
 				
 				//Determine if we need to use acceptssl flag
 				String acceptSSLValue="";
 				if(acceptSSL){
 					acceptSSLValue="-acceptssl";
 				}
-				
+				char quote = '\"';
 				//Build the script file we'll pass into the AppScan Source CLI
-				String cliScriptContent = "login_file " + getDescriptor().getASE_URL() + " " + getDescriptor().getLoginTokenFilePath() + " " + acceptSSLValue + System.lineSeparator();
-				cliScriptContent += "oa " + applicationFile + System.lineSeparator();
-				cliScriptContent += "sc " + scanWorkspace + System.lineSeparator();
+				String cliScriptContent = "login_file " + getDescriptor().getASE_URL() + " " + quote + getDescriptor().getLoginTokenFilePath() + quote + " " + acceptSSLValue + System.lineSeparator();
+				cliScriptContent += "oa " + quote + applicationFile + quote + System.lineSeparator();
+				cliScriptContent += "sc " + quote + scanWorkspace + quote + System.lineSeparator();
 				
 				AppScanSourceExecutor.execute(run, ws, launcher, installation, node, listener, envVars, cliScriptContent);
-				/*
-				//Create a temp file with our script commands
-				FilePath tempFile = ws.createTextTempFile("temp_cli_script_", ".txt", cliScriptContent);
-				
-				//Build the command line commands with necessary parameters
-				CLIRunner runner = new CLIRunner(run, ws, launcher, listener);
-				AppScanSourceInvocation invocation = new AppScanSourceInvocation(exe, run, ws, listener); 
-				invocation.addScriptFile(tempFile);
-				
-				//Execute command line
-				if (!invocation.execute(runner)) {
-	                throw new AbortException("AppScan Source execution failed");
-	            }			
-				//Delete the temp file after we use it
-				tempFile.delete();
-				*/
+
 			} else {
 				logger.println("Please resolve issues with your application file or scan workspace configuration.");
 			}

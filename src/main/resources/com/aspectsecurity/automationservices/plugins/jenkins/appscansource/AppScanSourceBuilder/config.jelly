@@ -23,8 +23,8 @@
 		<f:checkbox default="false" value="${it.acceptSSL}" />
 	</f:entry>
 	
-	<f:entry title="Scan Workspace Directory" field="scanWorkspace">
-		<f:textbox value="${it.scanWorkspace}" />
+	<f:entry title="Custom Scan Workspace (leave blank for default)" field="customScanWorkspace">
+		<f:textbox value="${it.customScanWorkspace}" />
 	</f:entry>
 	
 	<f:entry title="Application File" field="applicationFile">
