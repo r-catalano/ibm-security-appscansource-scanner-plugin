@@ -1,4 +1,4 @@
-package com.aspectsecurity.automationservices.plugins.jenkins.appscansource;
+package com.aspectsecurity.automationservices.plugins.jenkins.appscansource.scanner;
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Launcher;
@@ -22,8 +22,9 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 
-import com.aspectsecurity.automationservices.appscansource.utilities.AppScanSourceExecutor;
-import com.aspectsecurity.automationservices.appscansource.utilities.JenkinsExecutor;
+import com.aspectsecurity.automationservices.plugins.jenkins.appscansource.runtime.AppScanSourceExecutor;
+import com.aspectsecurity.automationservices.plugins.jenkins.appscansource.runtime.AppScanSourceInstallation;
+import com.aspectsecurity.automationservices.utilities.jenkins.JenkinsExecutor;
 
 import org.kohsuke.stapler.QueryParameter;
 
