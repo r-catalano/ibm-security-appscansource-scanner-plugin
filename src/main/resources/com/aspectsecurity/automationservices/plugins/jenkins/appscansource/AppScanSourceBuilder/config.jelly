@@ -31,4 +31,8 @@
 		<f:textbox value="${it.applicationFile}" />
 	</f:entry>
 
+	<f:entry field="thirdPartyCode" title="This is third party code">
+        	<f:checkbox default="false" value="${it.thirdPartyCode}" />
+    </f:entry>
+
 </j:jelly>

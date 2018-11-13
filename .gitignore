@@ -1,6 +1,9 @@
 # Compiled files
 *.class
 
+# Intellij project
+.idea/*
+
 # Target
 target/*
 

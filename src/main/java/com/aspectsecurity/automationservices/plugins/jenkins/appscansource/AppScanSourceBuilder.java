@@ -48,6 +48,7 @@ public class AppScanSourceBuilder extends Builder implements SimpleBuildStep {
     private final String customScanWorkspace;
     private String scanWorkspace;
     private final String applicationFile;
+	private final boolean thirdPartyCode;
     private String installation;
     Jenkins j = Jenkins.getInstance();
     private final static String applicationFileNameValidationError="Please point to a PAF or SLN file";
@@ -56,11 +57,12 @@ public class AppScanSourceBuilder extends Builder implements SimpleBuildStep {
 
     // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
     @DataBoundConstructor
-    public AppScanSourceBuilder(String installation, boolean disableScan, String applicationFile, boolean acceptSSL, String customScanWorkspace) {
+    public AppScanSourceBuilder(String installation, boolean disableScan, String applicationFile, boolean acceptSSL, String customScanWorkspace, boolean thirdPartyCode) {
     	this.disableScan=disableScan;
         this.applicationFile=applicationFile;
         this.installation=installation;
         this.acceptSSL=acceptSSL;
+		this.thirdPartyCode=thirdPartyCode;
         
         
         if (customScanWorkspace == null){
@@ -95,6 +97,10 @@ public class AppScanSourceBuilder extends Builder implements SimpleBuildStep {
     
     public String getInstallation() {
         return installation;
+    }
+
+	public boolean getThirdPartyCode() {
+    	return thirdPartyCode;
     }
     
     @DataBoundSetter
@@ -153,9 +159,15 @@ public class AppScanSourceBuilder extends Builder implements SimpleBuildStep {
 				if(acceptSSL){
 					acceptSSLValue="-acceptssl";
 				}
+				String tpcValue="";
+				if(thirdPartyCode) {
+					tpcValue="--thirdparty";
+				}
 				char quote = '\"';
 				//Build the script file we'll pass into the AppScan Source CLI
-				String cliScriptContent = "login_file " + getDescriptor().getASE_URL() + " " + quote + getDescriptor().getLoginTokenFilePath() + quote + " " + acceptSSLValue + System.lineSeparator();
+				String cliScriptContent = "login_file " + getDescriptor().getASE_URL() + " " + quote +
+						getDescriptor().getLoginTokenFilePath() + quote + " " + acceptSSLValue +
+						tpcValue + System.lineSeparator();
 				cliScriptContent += "oa " + quote + applicationFile + quote + System.lineSeparator();
 				cliScriptContent += "sc " + quote + scanWorkspace + quote + System.lineSeparator();
 				
